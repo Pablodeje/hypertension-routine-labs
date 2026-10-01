@@ -1,0 +1,10 @@
+# Data and results derived from MIMIC-IV (not shared, under the data use agreement)
+output/
+*.xlsx
+*.csv
+*.parquet
+*.svg
+*.png
+*.tif
+__pycache__/
+.idea/
