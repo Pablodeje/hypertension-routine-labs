@@ -37,15 +37,15 @@ def side(x, y, excl):
 X = 32
 XE = 59
 
-n0 = node(X, 95, "Patients in MIMIC-IV v3.0\nn = 364,627")
-e1 = node(XE, 84, "Excluded (n = 278,728)\nMeasurement criterion not met:\n≥3 determinations of each of the 17\nanalytes and ≥3 blood pressure readings", ha="left")
-n1 = node(X, 73, "Eligible patients\nn = 85,899")
+n0 = node(X, 95, "Patients in MIMIC-IV v3.1\nn = 364,627")
+e1 = node(XE, 84, "Excluded (n = 278,731)\nMeasurement criterion not met:\n≥3 determinations of each of the 17\nanalytes and ≥3 blood pressure readings", ha="left")
+n1 = node(X, 73, "Eligible patients\nn = 85,896")
 e2 = node(XE, 63, "Excluded (n = 5,601)\nNo hospital admission record", ha="left")
-n2 = node(X, 53, "Patients with an\nadmission record\nn = 80,298")
+n2 = node(X, 53, "Patients with an\nadmission record\nn = 80,295")
 e3 = node(XE, 43.5, "Excluded (n = 440)\n≥1 value outside plausibility limits", ha="left")
-n3 = node(X, 32, "Analytical cohort\nn = 79,858\nHypertension: 49,655 (62.2%)\nControls: 30,203")
-tr = node(17, 10, "Training set (75%)\nn = 59,893\nHypertension: 37,241\nControls: 22,652")
-te = node(57, 10, "Test set (25%)\nn = 19,965\nHypertension: 12,414\nControls: 7,551")
+n3 = node(X, 32, "Analytical cohort\nn = 79,855\nHypertension: 49,654 (62.2%)\nControls: 30,201")
+tr = node(17, 10, "Training set (75%)\nn = 59,891\nHypertension: 37,240\nControls: 22,651")
+te = node(57, 10, "Test set (25%)\nn = 19,964\nHypertension: 12,414\nControls: 7,550")
 
 down(n0, n1)
 side(X, 84, e1)

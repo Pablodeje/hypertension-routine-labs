@@ -1,10 +1,11 @@
 import textwrap
 import matplotlib.pyplot as plt
+import pandas as pd
 from matplotlib.patches import FancyBboxPatch, Rectangle, Circle, FancyArrowPatch
 
 import config as c
 
-# Graphical abstract (numbers as reported in the paper)
+# Graphical abstract (text as reported in the paper; AUROCs and analyte contributions read from the outputs)
 
 # ---------------- Settings ----------------
 SVG = c.FIGURES / "graphical_abstract.svg"    # editable
@@ -22,20 +23,38 @@ TEXTS = {
     "Key question": "Hypertension is diagnosed from blood pressure alone. Do routine blood tests, "
                     "already collected during ordinary care, add information on hypertension "
                     "status beyond blood pressure?",
-    "Key findings": "In 79,858 adults, adding routine laboratory predictors to blood pressure raised "
-                    "discrimination from 0.822 to 0.881–0.885, with consistent gains across five "
-                    "algorithms. Thirty selected predictors retained 93% of the gain.",
+    "Key findings": "In 79,855 adults, adding routine laboratory predictors to blood pressure raised "
+                    "discrimination from 0.816 to 0.878–0.881, with consistent gains across five "
+                    "algorithms. Thirty-four selected predictors retained 95% of the gain.",
     "Take-home message": "Routine blood tests carry information on hypertension beyond blood pressure, "
                          "concentrated in a few analytes. Their value for screening requires validation "
                          "with treatment data and in screening populations.",
 }
-# Results (as reported in the paper; best algorithm, CatBoost)
-AUROC = [("Blood pressure", 0.822, GREY), ("+ 30 (lasso)", 0.881, BLUE),
-         ("+ 70 (SHAP)", 0.884, BLUE), ("+ all 102", 0.885, BLUE)]
-ANALYTES_GA = [("Urea nitrogen", 16.8, "Renal function"), ("Glucose", 14.2, "Glucose"),
-            ("Chloride", 9.9, "Electrolytes"), ("Creatinine", 9.0, "Renal function"),
-            ("Potassium", 8.8, "Electrolytes"), ("White cells", 7.3, "White cells and platelets"),
-            ("Red cell width", 5.8, "Red cells")]
+# Results, read from the outputs: test AUROC of the best model of each set (Table 2) and
+# contribution of the seven leading analytes (Figure 4, same computation as 43_fig4_shap_analytes.py)
+best = pd.read_excel(c.BENCHMARK, sheet_name="Best by set").set_index("Set")["AUROC"]
+n_lasso = int(pd.read_excel(c.SELECTION_LASSO)["Selected"].sum())
+n_shap = int(pd.read_excel(c.SELECTION_CATBOOST, sheet_name="SHAP ranking")["Selected"].sum())
+AUROC = [("Blood pressure", best["BP"], GREY), (f"+ {n_lasso} (lasso)", best["BP+Lasso"], BLUE),
+         (f"+ {n_shap} (SHAP)", best["BP+SHAP"], BLUE), ("+ all 102", best["BP+All"], BLUE)]
+
+LABEL_GA = {
+    "Sodium": ("Sodium", "Electrolytes"), "Potassium": ("Potassium", "Electrolytes"),
+    "Chloride": ("Chloride", "Electrolytes"), "Bicarbonate": ("Bicarbonate", "Electrolytes"),
+    "Anion GAP": ("Anion gap", "Electrolytes"),
+    "Urea Nitrogen": ("Urea nitrogen", "Renal function"), "Creatinine": ("Creatinine", "Renal function"),
+    "Glucose": ("Glucose", "Glucose"),
+    "White Blood Cells": ("White cells", "White cells and platelets"),
+    "Platelet Count": ("Platelets", "White cells and platelets"),
+    "Hemoglobin": ("Haemoglobin", "Red cells"), "Hematocrit": ("Haematocrit", "Red cells"),
+    "Red Blood Cells": ("Red cells", "Red cells"), "MCV": ("MCV", "Red cells"),
+    "MCH": ("MCH", "Red cells"), "MCHC": ("MCHC", "Red cells"), "RDW": ("Red cell width", "Red cells"),
+}
+r = pd.read_excel(c.SELECTION_CATBOOST, sheet_name="SHAP ranking")
+r["analyte"] = r["Variable"].str.rsplit("_", n=1).str[0]
+r = r[r["analyte"].isin(LABEL_GA)]
+pct = (r.groupby("analyte")["SHAP"].sum() / r["SHAP"].sum() * 100).sort_values(ascending=False).head(7)
+ANALYTES_GA = [(LABEL_GA[a][0], round(v, 1), LABEL_GA[a][1]) for a, v in pct.items()]
 
 plt.rcParams.update({"font.family": "Arial", "font.size": 10})
 fig = plt.figure(figsize=(WIDTH / 2.54, HEIGHT / 2.54))
@@ -90,7 +109,7 @@ def arrow(x0, x1, y=3.9):
 # Block 1: population and data
 x1 = 0.75
 ax.text(x1, 6.6, "Population and data", fontsize=11, fontweight="bold")
-ax.text(x1, 6.2, "79,858 adults, emergency\nand intensive care", fontsize=10, va="top", color="#404040", linespacing=1.2)
+ax.text(x1, 6.2, "79,855 adults, emergency\nand intensive care", fontsize=10, va="top", color="#404040", linespacing=1.2)
 cuff(x1, 4.05)
 ax.text(x1 + 1.95, 4.55, "Blood\npressure", fontsize=10, va="center")
 tube(x1 + 0.2, 2.55)
@@ -106,9 +125,9 @@ ax.add_patch(FancyBboxPatch((x2, 4.6), w2, 1.1, boxstyle="round,pad=0,rounding_s
 ax.text(x2 + w2 / 2, 5.15, "Blood pressure alone", fontsize=10, ha="center", va="center")
 ax.text(x2 + w2 / 2, 4.2, "vs", fontsize=10, ha="center", va="center", fontstyle="italic")
 ax.add_patch(FancyBboxPatch((x2, 2.2), w2, 1.6, boxstyle="round,pad=0,rounding_size=0.15", fc="#E5F1F8", ec=BLUE, lw=1))
-ax.text(x2 + w2 / 2, 3.0, "Blood pressure +\nlaboratory predictors\n(30, 70 or all 102)", fontsize=10,
+ax.text(x2 + w2 / 2, 3.0, f"Blood pressure +\nlaboratory predictors\n({n_lasso}, {n_shap} or all 102)", fontsize=10,
         ha="center", va="center", linespacing=1.2)
-ax.text(x2, 1.55, "5 algorithms, tested on\n19,965 unseen patients", fontsize=10, va="top", color="#404040", linespacing=1.2)
+ax.text(x2, 1.55, "5 algorithms, tested on\n19,964 unseen patients", fontsize=10, va="top", color="#404040", linespacing=1.2)
 
 # Block 3: findings (discrimination and main analytes)
 x3 = 9.75

@@ -4,10 +4,10 @@
 PYTHON ?= python
 S = scripts
 
-.PHONY: all cohort lasso elasticnet shap kcurve-lasso selection benchmark tables figures
+.PHONY: all cohort lasso elasticnet shap kcurve-lasso selection benchmark tables figures minimal
 
 # Everything, in order (several hours, mostly the benchmark)
-all: cohort selection benchmark tables figures
+all: cohort selection benchmark tables figures minimal
 
 # Analytical cohort from the raw MIMIC-IV files -> output/cohort_clean.xlsx
 cohort:
@@ -37,7 +37,7 @@ kcurve-lasso:
 # All predictor selection
 selection: lasso elasticnet shap kcurve-lasso
 
-# 5 algorithms x 4 predictor sets (several hours) -> output/benchmark/
+# 5 algorithms x 4 predictor sets (several hours) -> output/benchmark/ (best model of each set: predictions, .joblib, .onnx)
 benchmark:
 	$(PYTHON) $(S)/20_benchmark.py
 
@@ -62,3 +62,7 @@ figures:
 	$(PYTHON) $(S)/45_supp_fig2_calibration.py
 	$(PYTHON) $(S)/46_supp_spider.py
 	$(PYTHON) $(S)/47_graphical_abstract.py
+
+# Minimalist model for the demonstration web page (post hoc; after benchmark) -> output/benchmark/
+minimal:
+	$(PYTHON) $(S)/50_minimal_model.py
