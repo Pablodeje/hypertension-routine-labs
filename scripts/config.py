@@ -8,7 +8,6 @@ LABEVENTS = MIMIC_DIR / "hosp" / "labevents.csv.gz"
 OMR = MIMIC_DIR / "hosp" / "omr.csv.gz"
 DIAGNOSES = MIMIC_DIR / "hosp" / "diagnoses_icd.csv.gz"
 ADMISSIONS = MIMIC_DIR / "hosp" / "admissions.csv.gz"
-PATIENTS = MIMIC_DIR / "hosp" / "patients.csv.gz"
 
 # Outputs go to output/ in the repository root (excluded from version control)
 OUTPUT = Path(__file__).resolve().parent.parent / "output"
@@ -18,7 +17,6 @@ BP_PARQUET = OUTPUT / "bp.parquet"
 COHORT = OUTPUT / "cohort.parquet"                 # all eligible patients, before plausibility exclusions
 COHORT_CLEAN = OUTPUT / "cohort_clean.xlsx"        # after plausibility exclusions; input to the analyses
 AVAILABILITY = OUTPUT / "availability.parquet"     # >=3 determinations per analyte, all patients with lab data
-TABLE1_DATA = OUTPUT / "table1_data.parquet"       # age, sex and number of determinations
 SELECTION_LASSO = OUTPUT / "selection_lasso.xlsx"
 SELECTION_ELASTICNET = OUTPUT / "selection_elasticnet.xlsx"
 SELECTION_CATBOOST = OUTPUT / "selection_catboost.xlsx"
@@ -27,8 +25,6 @@ KCURVE_LASSO = OUTPUT / "kcurve_lasso.xlsx"
 BENCHMARK_DIR = OUTPUT / "benchmark"
 BENCHMARK_DIR.mkdir(exist_ok=True)
 BENCHMARK = BENCHMARK_DIR / "benchmark_results.xlsx"
-FIGURES = OUTPUT / "figures"
-FIGURES.mkdir(exist_ok=True)
 
 # ---------------- Analytes (Supplementary Table 5; identical item IDs in v3.0 and v3.1) ----------------
 ITEMIDS = {

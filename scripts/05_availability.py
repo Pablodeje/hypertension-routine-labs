@@ -1,7 +1,7 @@
 import pandas as pd
 import config as c
 
-# Availability of each analyte among all patients with laboratory data (input to Supplementary Figure 1):
+# Availability of each analyte among all patients with laboratory data (missing-data analysis, Methods):
 # True if the patient has >= 3 determinations of that analyte
 labs = pd.read_parquet(c.LABS_PARQUET)
 

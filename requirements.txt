@@ -1,7 +1,6 @@
 catboost==1.2.10
 glum==3.4.1
 joblib==1.6.0
-matplotlib==3.11.2
 numpy==2.5.3
 onnx==1.23.2
 onnxruntime==1.30.0
